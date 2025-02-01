@@ -69,7 +69,7 @@ schedule.every(30).minutes.do(check_news)
 schedule.every().day.at("08:00").do(send_status_message)
 schedule.every().day.at("17:00").do(send_status_message)
 # Надсилання тест
-schedule.every().day.at("17:13").do(send_status_message)
+schedule.every().day.at("17:20").do(send_status_message)
 schedule.every().day.at("18:00").do(send_status_message)
 schedule.every().day.at("00:00").do(send_status_message)
 while True:
