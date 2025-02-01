@@ -35,6 +35,8 @@ def check_news():
         # Цільова дата
         
 target_date = "2025-02-01"
+target_date = datetime.datetime.now().strftime("%Y-%m-%d")
+
 
         found = False  # Прапорець для перевірки, чи була знайдена новина
 
