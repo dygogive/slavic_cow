@@ -3,10 +3,9 @@ from flask import Flask, request
 import schedule
 import time
 import datetime
-from datetime import timezone, timedelta
-import os
-from bs4 import BeautifulSoup
 from pytz import timezone
+from bs4 import BeautifulSoup
+import os
 
 app = Flask(__name__)
 
@@ -21,7 +20,6 @@ CHAT_ID = None
 URL = "https://www.dar.gov.ua/news"
 
 # Часовий пояс Києва
-#KYIV_TZ = timezone(timedelta(hours=2))
 KYIV_TZ = timezone("Europe/Kiev")
 
 
@@ -69,8 +67,6 @@ def check_news():
             return
 
         # Цільова дата
-        #target_date = "2025-01-07"
-        # Цільова дата з урахуванням Київського часу
         target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
         print(f"Перевіряємо цільову дату: {target_date}")
 
@@ -101,10 +97,10 @@ def send_status_message():
         print("CHAT_ID не встановлений. Статусне повідомлення не надіслано.")
 
 
-# Встановити вебхук
+# Встановити вебхук (викликається лише вручну)
 def set_webhook():
     url = f"{BASE_URL}/setWebhook"
-    webhook_url = f"https://<ваш_домен>/{TELEGRAM_BOT_TOKEN}"
+    webhook_url = f"https://{os.getenv('RAILWAY_STATIC_URL')}/{TELEGRAM_BOT_TOKEN}"
     response = requests.post(url, data={"url": webhook_url})
     print(f"Set webhook response: {response.status_code} - {response.text}")
 
@@ -115,5 +111,8 @@ schedule.every().day.at("08:00").do(send_status_message)
 schedule.every().day.at("17:00").do(send_status_message)
 
 if __name__ == "__main__":
-    set_webhook()
+    # Увімкніть виклик set_webhook вручну, коли потрібно
+    if os.getenv("SET_WEBHOOK") == "true":
+        set_webhook()
+
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
