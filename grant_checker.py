@@ -120,4 +120,4 @@ if __name__ == "__main__":
     schedule_thread = Thread(target=run_schedule)
     schedule_thread.start()
 
-    app.run(host="0.0.0.0", port=i
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
