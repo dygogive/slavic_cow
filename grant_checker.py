@@ -24,6 +24,7 @@ KYIV_TZ = timezone("Europe/Kiev")
 
 
 def send_telegram_message(chat_id, text):
+    """Функція для надсилання повідомлення через Telegram API."""
     url = f"{BASE_URL}/sendMessage"
     params = {"chat_id": chat_id, "text": text}
     response = requests.get(url, params=params)
@@ -32,6 +33,7 @@ def send_telegram_message(chat_id, text):
 
 @app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
 def telegram_webhook():
+    """Обробка запитів від Telegram."""
     global CHAT_ID
 
     update = request.get_json()
@@ -50,6 +52,7 @@ def telegram_webhook():
 
 
 def check_news():
+    """Функція перевірки новин на сайті."""
     if CHAT_ID is None:
         print("CHAT_ID не встановлений. Спочатку виконайте /start.")
         return
@@ -91,14 +94,15 @@ def check_news():
 
 
 def send_status_message():
+    """Надсилання статусного повідомлення."""
     if CHAT_ID:
         send_telegram_message(CHAT_ID, "✅ Скрипт працює!")
     else:
         print("CHAT_ID не встановлений. Статусне повідомлення не надіслано.")
 
 
-# Встановити вебхук (викликається лише вручну)
 def set_webhook():
+    """Функція для налаштування вебхука Telegram."""
     url = f"{BASE_URL}/setWebhook"
     webhook_url = f"https://{os.getenv('RAILWAY_STATIC_URL')}/{TELEGRAM_BOT_TOKEN}"
     response = requests.post(url, data={"url": webhook_url})
@@ -111,8 +115,9 @@ schedule.every().day.at("08:00").do(send_status_message)
 schedule.every().day.at("17:00").do(send_status_message)
 
 if __name__ == "__main__":
-    # Увімкніть виклик set_webhook вручну, коли потрібно
+    # Налаштування вебхука при потребі
     if os.getenv("SET_WEBHOOK") == "true":
         set_webhook()
 
+    # Запуск Flask додатку
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
