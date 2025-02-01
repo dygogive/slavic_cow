@@ -11,6 +11,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # Список ID чатів
 CHAT_ID_1 = "1037025457"
+CHAT_ID_2 = "8974894891"
 CHAT_ID_2 = "8171469284"
 CHAT_IDS = [CHAT_ID_1, CHAT_ID_2]  
 
@@ -31,7 +32,7 @@ def check_news():
     try:
         response = requests.get(URL)
         soup = BeautifulSoup(response.text, "html.parser")
-        
+
         # Знайти всі дати на сторінці
         dates = soup.find_all("p", class_="paragraph-18 textadata")
 
@@ -75,7 +76,7 @@ send_telegram_message("✅ Скрипт запущено і працює!")
 check_news()
 
 # Запуск перевірки новин кожні 10 хвилин
-schedule.every(15).minutes.do(check_news)
+schedule.every(10).minutes.do(check_news)
 
 # Надсилання повідомлення про статус о 10:00 +02 UTC
 schedule.every().day.at("08:00").do(send_status_message)
@@ -84,4 +85,4 @@ schedule.every().day.at("17:00").do(send_status_message)
 
 while True:
     schedule.run_pending()
-    time.sleep(900)
+    time.sleep(600)
