@@ -3,9 +3,10 @@ from bs4 import BeautifulSoup
 import schedule
 import time
 import datetime  # Додаємо імпорт datetime
+import os
 
 # Токен і Chat ID для Telegram
-TELEGRAM_BOT_TOKEN = "7633507105:AAGLSVNx7eZFe2vji0NgQ4EbyLWedpcOk_w"
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = "1037025457"
 
 # URL сайту
