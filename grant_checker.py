@@ -8,6 +8,7 @@ import os
 # Токен і Chat ID для Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = "1037025457"
+print("TELEGRAM_BOT_TOKEN:", TELEGRAM_BOT_TOKEN)
 
 # URL сайту
 URL = "https://www.dar.gov.ua/news"
@@ -57,6 +58,7 @@ def check_news():
 # Надіслати повідомлення при запуску
 send_telegram_message("✅ Скрипт запущено і працює!")
 # Одразу перевіряємо новини
+
 check_news()
 
 # Запуск перевірки новин кожні 10 хвилин
