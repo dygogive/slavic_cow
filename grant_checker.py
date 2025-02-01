@@ -6,6 +6,7 @@ import datetime
 from datetime import timezone, timedelta
 import os
 from bs4 import BeautifulSoup
+from pytz import timezone
 
 app = Flask(__name__)
 
@@ -20,7 +21,8 @@ CHAT_ID = None
 URL = "https://www.dar.gov.ua/news"
 
 # Часовий пояс Києва
-KYIV_TZ = timezone(timedelta(hours=2))
+#KYIV_TZ = timezone(timedelta(hours=2))
+KYIV_TZ = timezone("Europe/Kiev")
 
 
 def send_telegram_message(chat_id, text):
@@ -66,6 +68,8 @@ def check_news():
             send_telegram_message(CHAT_ID, "🔴 Дати не знайдено. Можливо, структура сайту інша.")
             return
 
+        # Цільова дата
+        #target_date = "2025-01-07"
         # Цільова дата з урахуванням Київського часу
         target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
         print(f"Перевіряємо цільову дату: {target_date}")
