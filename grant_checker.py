@@ -10,8 +10,6 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = "1037025457"
 print("TELEGRAM_BOT_TOKEN:", TELEGRAM_BOT_TOKEN)
 
-KYIV_TZ = timezone("Europe/Kiev")
-
 # URL сайту
 URL = "https://www.dar.gov.ua/news"
 
@@ -35,7 +33,7 @@ def check_news():
             return
 
         # Цільова дата
-        target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
+        target_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
         found = False  # Прапорець для перевірки, чи була знайдена новина
 
