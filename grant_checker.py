@@ -85,4 +85,4 @@ schedule.every().day.at("17:00").do(send_status_message)
 
 while True:
     schedule.run_pending()
-    time.sleep(600)
+    time.sleep(1)
