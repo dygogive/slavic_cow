@@ -1,5 +1,19 @@
 from flask import Flask, request
 import os
+import requests
+
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
+WEBHOOK_URL = f"https://slaviccow-production.up.railway.app/{TELEGRAM_BOT_TOKEN}"
+
+def set_webhook():
+    response = requests.post(f"{BASE_URL}/setWebhook", data={"url": WEBHOOK_URL})
+    print(f"Webhook set: {response.status_code}, {response.json()}")
+
+if __name__ == "__main__":
+    set_webhook()
+
 
 app = Flask(__name__)
 
