@@ -75,7 +75,7 @@ send_telegram_message("✅ Скрипт запущено і працює!")
 check_news()
 
 # Запуск перевірки новин кожні 10 хвилин
-schedule.every(10).minutes.do(check_news)
+schedule.every(15).seconds.do(check_news)
 
 # Надсилання повідомлення про статус о 10:00 +02 UTC
 schedule.every().day.at("08:00").do(send_status_message)
@@ -84,4 +84,4 @@ schedule.every().day.at("17:00").do(send_status_message)
 
 while True:
     schedule.run_pending()
-    time.sleep(600)
+    time.sleep(1)
