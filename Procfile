@@ -1,1 +1,1 @@
-web: gunicorn grant_checker:app --bind 0.0.0.0:$PORT
+worker: python grant_checker.py
