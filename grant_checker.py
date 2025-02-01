@@ -103,8 +103,8 @@ def send_status_message():
 
 def set_webhook():
     """Функція для налаштування вебхука Telegram."""
-    url = f"{BASE_URL}/setWebhook"
     webhook_url = f"https://{os.getenv('RAILWAY_STATIC_URL')}/{TELEGRAM_BOT_TOKEN}"
+    url = f"{BASE_URL}/setWebhook"
     response = requests.post(url, data={"url": webhook_url})
     print(f"Set webhook response: {response.status_code} - {response.text}")
 
@@ -114,10 +114,20 @@ schedule.every(10).minutes.do(check_news)
 schedule.every().day.at("08:00").do(send_status_message)
 schedule.every().day.at("17:00").do(send_status_message)
 
+def run_schedule():
+    """Функція для запуску розкладу."""
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
 if __name__ == "__main__":
-    # Налаштування вебхука при потребі
+    # Встановити вебхук, якщо це необхідно
     if os.getenv("SET_WEBHOOK") == "true":
         set_webhook()
 
-    # Запуск Flask додатку
+    # Запуск Flask додатку через gunicorn
+    from threading import Thread
+    schedule_thread = Thread(target=run_schedule)
+    schedule_thread.start()
+
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
