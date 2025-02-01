@@ -21,6 +21,7 @@ URL = "https://www.dar.gov.ua/news"
 KYIV_TZ = timezone("Europe/Kiev")
 
 def send_telegram_message(text):
+    print(f"[DEBUG] Надсилання повідомлення: {text}")
     for chat_id in CHAT_IDS:  # Перебираємо кожен chat_id
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
         params = {"chat_id": chat_id, "text": text}
@@ -66,11 +67,9 @@ def check_news():
     except Exception as e:
         print("Помилка у виконанні запиту або парсингу:", e)
 
-def send_status_message():
-    send_telegram_message("✅ Скрипт працює!")
 
 # Надіслати повідомлення при запуску
-#send_telegram_message("✅ Скрипт запущено і працює!")
+send_telegram_message("✅ Скрипт запущено і працює!")
 #запустити перевірку
 check_news()
 
@@ -78,11 +77,10 @@ check_news()
 schedule.every(10).minutes.do(check_news)
 
 # Надсилання повідомлення про статус о 10:00 +02 UTC
-#schedule.every().day.at("08:00").do(send_status_message)
+schedule.every().day.at("08:00").do(send_telegram_message("✅ Скрипт працює!"))
 # Надсилання повідомлення про статус о 19:00 +02 UTC
-#schedule.every().day.at("17:00").do(send_status_message)
-#schedule.every().day.at("23:06").do(send_status_message)
+schedule.every().day.at("23:25").do(send_telegram_message("✅ Скрипт працює!"))
 
 while True:
     schedule.run_pending()
-    time.sleep(500)
+    time.sleep(10)
