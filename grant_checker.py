@@ -66,6 +66,7 @@ def check_news():
 
 
 # Надіслати повідомлення при запуску
+print("[DEBUG] Викликаємо `send_telegram_message` з текстом: Скрипт запущено і працює!")
 send_telegram_message("✅ Скрипт запущено і працює!")
 # Запустити перевірку
 check_news()
