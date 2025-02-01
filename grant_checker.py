@@ -73,13 +73,9 @@ check_news()
 # Запуск перевірки новин кожні 30 хвилин
 schedule.every(10).minutes.do(check_news)
 
-# Надсилання повідомлення про статус о 8:00 та 17:00
-schedule.every().day.at("06:00").do(send_status_message)
-schedule.every().day.at("15:00").do(send_status_message)
-# Надсилання тест
-schedule.every().day.at("15:30").do(send_status_message)
-schedule.every().day.at("16:00").do(send_status_message)
-schedule.every().day.at("22:00").do(send_status_message)
+# Надсилання повідомлення про статус о 10:00
+schedule.every().day.at("08:00").do(send_status_message)
+
 while True:
     schedule.run_pending()
     time.sleep(1)
