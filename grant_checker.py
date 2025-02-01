@@ -8,8 +8,11 @@ from pytz import timezone
 
 # Токен і Chat ID для Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = "1037025457"
-print("TELEGRAM_BOT_TOKEN:", TELEGRAM_BOT_TOKEN)
+
+# Список ID чатів
+CHAT_ID_1 = "1037025457"
+CHAT_ID_2 = "8974894891"
+CHAT_IDS = [CHAT_ID_1, CHAT_ID_2]  
 
 # URL сайту
 URL = "https://www.dar.gov.ua/news"
@@ -18,10 +21,11 @@ URL = "https://www.dar.gov.ua/news"
 KYIV_TZ = timezone("Europe/Kiev")
 
 def send_telegram_message(text):
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    params = {"chat_id": CHAT_ID, "text": text}
-    response = requests.get(url, params=params)
-    print(f"Telegram API Response: {response.status_code} - {response.text}")
+    for chat_id in CHAT_IDS:  # Перебираємо кожен chat_id
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        params = {"chat_id": chat_id, "text": text}
+        response = requests.get(url, params=params)
+        print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
 
 def check_news():
     try:
