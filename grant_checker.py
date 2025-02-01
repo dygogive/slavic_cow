@@ -22,7 +22,7 @@ KYIV_TZ = timezone("Europe/Kiev")
 
 def send_telegram_message(text):
     print(f"[DEBUG] Надсилання повідомлення: {text}")
-    for chat_id in CHAT_IDS:  # Перебираємо кожен chat_id
+    for chat_id in CHAT_IDS:
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
         params = {"chat_id": chat_id, "text": text}
         response = requests.get(url, params=params)
@@ -42,11 +42,8 @@ def check_news():
             return
 
         # Цільова дата
-        #target_date = "2025-01-07"
-        # Цільова дата з урахуванням Київського часу
         target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
         print(f"Перевіряємо цільову дату: {target_date}")
-
 
         found = False  # Прапорець для перевірки, чи була знайдена новина
 
@@ -58,7 +55,7 @@ def check_news():
             if date == target_date:
                 send_telegram_message(f"🟢 Знайдено новину з датою {target_date}! Перевірте сайт: {URL}")
                 print("Повідомлення надіслано.")
-                found = True  # Позначаємо, що новина знайдена
+                found = True
                 return  # Зупинити перевірку після першої знайденої новини
 
         # Якщо новина не знайдена
@@ -70,16 +67,16 @@ def check_news():
 
 # Надіслати повідомлення при запуску
 send_telegram_message("✅ Скрипт запущено і працює!")
-#запустити перевірку
+# Запустити перевірку
 check_news()
 
 # Запуск перевірки новин кожні 10 хвилин
 schedule.every(10).minutes.do(check_news)
 
-# Надсилання повідомлення про статус о 10:00 +02 UTC
-schedule.every().day.at("08:00").do(send_telegram_message("✅ Скрипт працює!"))
-# Надсилання повідомлення про статус о 19:00 +02 UTC
-schedule.every().day.at("23:25").do(send_telegram_message("✅ Скрипт працює!"))
+# Надсилання повідомлення про статус
+schedule.every().day.at("08:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
+schedule.every().day.at("17:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
+schedule.every().day.at("23:25").do(lambda: send_telegram_message("✅ Скрипт працює!"))
 
 while True:
     schedule.run_pending()
