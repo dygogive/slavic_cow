@@ -41,9 +41,9 @@ def check_news():
             return
 
         # Цільова дата
-        #target_date = "2025-01-07"
+        target_date = "2025-01-07"
         # Цільова дата з урахуванням Київського часу
-        target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
+        #target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
         print(f"Перевіряємо цільову дату: {target_date}")
 
 
