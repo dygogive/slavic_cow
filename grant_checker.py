@@ -70,7 +70,7 @@ def send_status_message():
     send_telegram_message("✅ Скрипт працює!")
 
 # Надіслати повідомлення при запуску
-send_telegram_message("✅ Скрипт запущено і працює!")
+#send_telegram_message("✅ Скрипт запущено і працює!")
 #запустити перевірку
 check_news()
 
