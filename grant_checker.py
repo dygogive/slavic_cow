@@ -4,7 +4,7 @@ import schedule
 import time
 import datetime
 import os
-from pytz import timezone  # Додаємо імпорт pytz для роботи з часовими поясами
+from pytz import timezone
 
 # Токен і Chat ID для Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
