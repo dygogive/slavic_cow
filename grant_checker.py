@@ -1,14 +1,15 @@
 import telebot
-import os
 
-# Встав свій API Token
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+# Вкажіть ваш API-токен
+bot = telebot.TeleBot('TELEGRAM_BOT_TOKEN')
 
-bot = telebot.TeleBot(BOT_TOKEN)
+@bot.message_handler(content_types=['text', 'document', 'audio'])
+def get_text_messages(message):
+    if message.text == "/start":
+        bot.send_message(message.chat.id, "Відповідає на старт")
+    elif message.text == "/help":
+        bot.send_message(message.chat.id, "Відповідає на хелп")
 
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    bot.reply_to(message, "Привіт!")
-
+# Запуск бота
 if __name__ == "__main__":
-    bot.polling(none_stop=True)
+    bot.polling(none_stop=True, interval=0)
