@@ -1,22 +1,14 @@
-from flask import Flask, request
+import telebot
 import os
 
-app = Flask(__name__)
+# Встав свій API Token
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+bot = telebot.TeleBot(BOT_TOKEN)
 
-@app.route("/")
-def home():
-    return "Бот працює!"
-
-@app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
-def telegram_webhook():
-    update = request.get_json()
-    if "message" in update:
-        text = update["message"].get("text", "")
-        if text == "/start":
-            print("Команда /start отримана!")
-    return "OK", 200
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Привіт!")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+    bot.polling(none_stop=True)
