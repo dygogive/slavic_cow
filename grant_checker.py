@@ -6,6 +6,10 @@ import datetime
 import os
 from threading import Thread
 from pytz import timezone
+from flask import Flask
+
+app = Flask(__name__)
+
 
 # Токен і Chat ID для Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
