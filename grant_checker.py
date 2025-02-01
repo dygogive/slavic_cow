@@ -33,7 +33,7 @@ def send_telegram_message(chat_id, text):
 
 @app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
 def telegram_webhook():
-    """Обробка вебхуків Telegram."""
+    """Обробка запитів від Telegram."""
     global CHAT_ID
 
     update = request.get_json()
@@ -41,17 +41,18 @@ def telegram_webhook():
         chat_id = update["message"]["chat"]["id"]
         text = update["message"].get("text", "")
 
+        # Якщо отримана команда /start
         if text == "/start":
             CHAT_ID = chat_id
-            send_telegram_message(CHAT_ID, "Бот успішно активовано. Ваш чат готовий для отримання повідомлень.")
+            send_telegram_message(CHAT_ID, f"Ваш chat_id: {CHAT_ID}. Бот готовий працювати!")
         else:
-            send_telegram_message(chat_id, "Будь ласка, введіть /start для активації бота.")
+            send_telegram_message(chat_id, "Будь ласка, введіть /start, щоб активувати бота.")
 
     return "OK", 200
 
 
 def check_news():
-    """Функція перевірки новин."""
+    """Функція перевірки новин на сайті."""
     global CHAT_ID
     if CHAT_ID is None:
         print("CHAT_ID не встановлений. Спочатку виконайте /start.")
@@ -60,32 +61,43 @@ def check_news():
     try:
         response = requests.get(URL)
         soup = BeautifulSoup(response.text, "html.parser")
+
+        # Знайти всі дати на сторінці
         dates = soup.find_all("p", class_="paragraph-18 textadata")
 
         if not dates:
             print("Дати не знайдено. Можливо, структура сайту інша.")
-            send_telegram_message(CHAT_ID, "🔴 Не знайдено дат на сайті. Можливо, структура сайту змінилася.")
+            send_telegram_message(CHAT_ID, "🔴 Дати не знайдено. Можливо, структура сайту інша.")
             return
 
+        # Цільова дата
         target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
-        print(f"Перевіряємо новини за датою: {target_date}")
+        print(f"Перевіряємо цільову дату: {target_date}")
+
+        found = False  # Прапорець для перевірки, чи була знайдена новина
 
         for date_element in dates:
             date = date_element.text.strip()
-            if date == target_date:
-                send_telegram_message(CHAT_ID, f"🟢 Новина з датою {target_date} знайдена! Перевірте сайт: {URL}")
-                return
+            print(f"Перевіряємо дату: {date}")
 
-        print(f"Новин з датою {target_date} не знайдено.")
+            # Якщо дата збігається з цільовою
+            if date == target_date:
+                send_telegram_message(CHAT_ID, f"🟢 Знайдено новину з датою {target_date}! Перевірте сайт: {URL}")
+                print("Повідомлення надіслано.")
+                found = True
+                return  # Зупинити перевірку після першої знайденої новини
+
+        # Якщо новина не знайдена
+        if not found:
+            print(f"Новин з датою {target_date} не знайдено.")
     except Exception as e:
-        print(f"Помилка: {e}")
+        print("Помилка у виконанні запиту або парсингу:", e)
 
 
 def send_status_message():
-    """Функція для надсилання статусного повідомлення."""
-    global CHAT_ID
+    """Надсилання статусного повідомлення."""
     if CHAT_ID:
-        send_telegram_message(CHAT_ID, "✅ Бот працює.")
+        send_telegram_message(CHAT_ID, "✅ Скрипт працює!")
     else:
         print("CHAT_ID не встановлений. Статусне повідомлення не надіслано.")
 
@@ -98,24 +110,23 @@ def set_webhook():
     print(f"Set webhook response: {response.status_code} - {response.text}")
 
 
-# Запуск завдань за розкладом
+# Надсилання статусних повідомлень за розкладом
 schedule.every(10).minutes.do(check_news)
 schedule.every().day.at("08:00").do(send_status_message)
 schedule.every().day.at("17:00").do(send_status_message)
 
 def run_schedule():
-    """Функція для запуску розкладу в окремому потоці."""
+    """Функція для запуску розкладу."""
     while True:
         schedule.run_pending()
         time.sleep(1)
-
 
 if __name__ == "__main__":
     # Встановити вебхук, якщо це необхідно
     if os.getenv("SET_WEBHOOK") == "true":
         set_webhook()
 
-    # Запуск Flask додатку
+    # Запуск Flask додатку через gunicorn
     from threading import Thread
     schedule_thread = Thread(target=run_schedule)
     schedule_thread.start()
