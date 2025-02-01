@@ -81,4 +81,4 @@ schedule.every().day.at("17:00").do(lambda: send_telegram_message("✅ Скри�
 
 while True:
     schedule.run_pending()
-    time.sleep(5)
+    time.sleep(300)
