@@ -17,6 +17,7 @@ CHAT_IDS = [CHAT_ID_1, CHAT_ID_2]
 # URL сайту
 URL = "https://www.dar.gov.ua/news"
 
+
 # Часовий пояс Києва
 KYIV_TZ = timezone("Europe/Kiev")
 
