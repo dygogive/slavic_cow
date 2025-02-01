@@ -27,6 +27,7 @@ def send_telegram_message(text):
         params = {"chat_id": chat_id, "text": text}
         response = requests.get(url, params=params)
         print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
+        time.sleep(0.5)  # Додаємо затримку в 0.5 секунди між повідомленнями
 
 def check_news():
     try:
