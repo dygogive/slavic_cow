@@ -68,7 +68,10 @@ schedule.every(30).minutes.do(check_news)
 # Надсилання повідомлення про статус о 8:00 та 17:00
 schedule.every().day.at("08:00").do(send_status_message)
 schedule.every().day.at("17:00").do(send_status_message)
-
+# Надсилання тест
+schedule.every().day.at("17:13").do(send_status_message)
+schedule.every().day.at("18:00").do(send_status_message)
+schedule.every().day.at("00:00").do(send_status_message)
 while True:
     schedule.run_pending()
     time.sleep(1)
