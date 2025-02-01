@@ -1,7 +1,5 @@
-Flask
 requests
 schedule
 pytz
 beautifulsoup4
 gunicorn
-pyTelegramBotAPI
