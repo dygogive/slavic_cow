@@ -1,1 +1,1 @@
-worker: python grant_checker.py
+web: python grant_checker.py
