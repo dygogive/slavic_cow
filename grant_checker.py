@@ -70,16 +70,15 @@ def check_news():
 print("[DEBUG] Викликаємо `send_telegram_message` з текстом: Скрипт запущено і працює!")
 send_telegram_message("✅ Скрипт запущено і працює!")
 # Запустити перевірку
-#check_news()
+check_news()
 
 # Запуск перевірки новин кожні 10 хвилин
-#schedule.every(10).minutes.do(check_news)
+schedule.every(10).minutes.do(check_news)
 
 # Надсилання повідомлення про статус
-#schedule.every().day.at("08:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
-#schedule.every().day.at("17:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
-#schedule.every().day.at("23:25").do(lambda: send_telegram_message("✅ Скрипт працює!"))
+schedule.every().day.at("08:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
+schedule.every().day.at("17:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
 
-#while True:
-    #schedule.run_pending()
-    #time.sleep(10)
+while True:
+    schedule.run_pending()
+    time.sleep(5)
