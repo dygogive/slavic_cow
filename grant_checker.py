@@ -71,8 +71,7 @@ def send_status_message():
 
 # Надіслати повідомлення при запуску
 send_telegram_message("✅ Скрипт запущено і працює!")
-# Одразу перевіряємо новини
-check_news()
+
 
 # Запуск перевірки новин кожні 10 хвилин
 schedule.every(10).minutes.do(check_news)
