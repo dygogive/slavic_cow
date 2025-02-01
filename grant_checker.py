@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import schedule
 import time
-import datetime  # Додаємо імпорт datetime
+import datetime
 import os
 
 # Токен і Chat ID для Telegram
@@ -16,7 +16,8 @@ URL = "https://www.dar.gov.ua/news"
 def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     params = {"chat_id": CHAT_ID, "text": text}
-    requests.get(url, params=params)
+    response = requests.get(url, params=params)
+    print(f"Telegram API Response: {response.status_code} - {response.text}")
 
 def check_news():
     try:
@@ -49,21 +50,25 @@ def check_news():
 
         # Якщо новина не знайдена
         if not found:
-            send_telegram_message(f"🔴 Новин з датою {target_date} не знайдено.")
             print(f"Новин з датою {target_date} не знайдено.")
     except Exception as e:
         print("Помилка у виконанні запиту або парсингу:", e)
 
+def send_status_message():
+    send_telegram_message("✅ Скрипт працює!")
 
 # Надіслати повідомлення при запуску
 send_telegram_message("✅ Скрипт запущено і працює!")
 # Одразу перевіряємо новини
-
 check_news()
 
-# Запуск перевірки новин кожні 10 хвилин
-schedule.every(5).minutes.do(check_news)
+# Запуск перевірки новин кожні 30 хвилин
+schedule.every(30).minutes.do(check_news)
+
+# Надсилання повідомлення про статус о 8:00 та 17:00
+schedule.every().day.at("08:00").do(send_status_message)
+schedule.every().day.at("17:00").do(send_status_message)
 
 while True:
     schedule.run_pending()
-    time.sleep(300)
+    time.sleep(1)
