@@ -69,7 +69,7 @@ def check_news():
 print("[DEBUG] Викликаємо `send_telegram_message` з текстом: Скрипт запущено і працює!")
 send_telegram_message("✅ Скрипт запущено і працює!")
 # Запустити перевірку
-check_news()
+#check_news()
 
 # Запуск перевірки новин кожні 10 хвилин
 schedule.every(10).minutes.do(check_news)
