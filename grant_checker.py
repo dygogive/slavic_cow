@@ -13,6 +13,9 @@ print("TELEGRAM_BOT_TOKEN:", TELEGRAM_BOT_TOKEN)
 # URL сайту
 URL = "https://www.dar.gov.ua/news"
 
+# Часовий пояс Києва
+KYIV_TZ = timezone("Europe/Kiev")
+
 def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     params = {"chat_id": CHAT_ID, "text": text}
@@ -33,8 +36,10 @@ def check_news():
             return
 
         # Цільова дата
-        target_date = "2025-01-07"
-
+        #target_date = "2025-01-07"
+        # Цільова дата з урахуванням Київського часу
+        target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
+        print(f"Перевіряємо цільову дату: {target_date}")
 
 
         found = False  # Прапорець для перевірки, чи була знайдена новина
