@@ -23,14 +23,13 @@ URL = "https://www.dar.gov.ua/news"
 KYIV_TZ = timezone("Europe/Kiev")
 
 def send_telegram_message(text):
-    print(f"[DEBUG] Надсилання повідомлення: {text}")
+    unique_text = f"{text} | ID: {datetime.datetime.now().timestamp()}"
     for chat_id in CHAT_IDS:
-        print("test1")
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        params = {"chat_id": chat_id, "text": text}
+        params = {"chat_id": chat_id, "text": unique_text}
         response = requests.get(url, params=params)
         print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
-        time.sleep(0.5)  # Додаємо затримку в 0.5 секунди між повідомленнями
+        time.sleep(0.5)
 
 def check_news():
     try:
