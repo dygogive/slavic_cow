@@ -6,98 +6,87 @@ import datetime
 import os
 from pytz import timezone
 
-isCheck = False
+# === Налаштування ===
+# Telegram Bot Token
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # Токен Telegram-бота (зчитується із середовища)
 
-# Токен і Chat ID для Telegram
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+# Чат ID для надсилання повідомлень
+CHAT_IDS = ["1037025457", "8171469284"]  # Список ID чатів, куди надсилати повідомлення
 
-# Список ID чатів
-CHAT_ID_1 = "1037025457"
-CHAT_ID_2 = "8171469284"
-
-# URL сайту
+# URL сайту для перевірки новин
 URL = "https://www.dar.gov.ua/news"
 
 # Часовий пояс Києва
 KYIV_TZ = timezone("Europe/Kiev")
 
+# === Функції ===
 
 def send_telegram_message(text):
+    """
+    Надсилання повідомлення у Telegram до всіх чатів із списку CHAT_IDS.
+    """
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-
-    # Перший чат
-    unique_text1 = f"{text} | ID: {datetime.datetime.now().timestamp()}"
-    params1 = {"chat_id": CHAT_ID_1, "text": unique_text1}
-    response1 = requests.get(url, params=params1)
-    print(f"Message sent to {CHAT_ID_1}. Response: {response1.status_code} - {response1.text}")
-
-    # Другий чат
-    unique_text2 = f"{text} | ID: {datetime.datetime.now().timestamp()}"
-    params2 = {"chat_id": CHAT_ID_2, "text": unique_text2}
-    response2 = requests.get(url, params=params2)
-    print(f"Message sent to {CHAT_ID_2}. Response: {response2.status_code} - {response2.text}")
-
-
+    for chat_id in CHAT_IDS:
+        params = {"chat_id": chat_id, "text": text}
+        response = requests.get(url, params=params)
+        print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
 
 def check_news():
+    """
+    Перевіряє новини на сайті за цільовою датою (поточний день).
+    Якщо знаходить новину з сьогоднішньою датою, надсилає повідомлення.
+    """
     try:
+        # Отримання HTML-сторінки
         response = requests.get(URL)
         soup = BeautifulSoup(response.text, "html.parser")
-        
-        # Знайти всі дати на сторінці
-        dates = soup.find_all("p", class_="paragraph-18 textadata")
 
+        # Пошук усіх дат новин на сторінці
+        dates = soup.find_all("p", class_="paragraph-18 textadata")
         if not dates:
             print("Дати не знайдено. Можливо, структура сайту інша.")
             send_telegram_message("🔴 Дати не знайдено. Можливо, структура сайту інша.")
             return
 
-        # Цільова дата
+        # Отримання поточної дати в Київському часі
         target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
         print(f"Перевіряємо цільову дату: {target_date}")
 
-        found = False  # Прапорець для перевірки, чи була знайдена новина
-
+        # Перевірка кожної знайденої дати
         for date_element in dates:
             date = date_element.text.strip()
             print(f"Перевіряємо дату: {date}")
 
-            # Якщо дата збігається з цільовою
-            if date == target_date:
+            if date == target_date:  # Якщо дата збігається з цільовою
                 send_telegram_message(f"🟢 Знайдено новину з датою {target_date}! Перевірте сайт: {URL}")
                 print("Повідомлення надіслано.")
-                found = True
-                return  # Зупинити перевірку після першої знайденої новини
+                return  # Зупиняємо перевірку після першого збігу
 
-        # Якщо новина не знайдена
-        if not found:
-            print(f"Новин з датою {target_date} не знайдено.")
-            if isCheck:
-                send_telegram_message(f"🔴 Новин з датою {target_date} не знайдено.")
+        # Якщо новини з сьогоднішньою датою не знайдено
+        print(f"Новин з датою {target_date} не знайдено.")
     except Exception as e:
         print("Помилка у виконанні запиту або парсингу:", e)
 
+def send_status_message():
+    """
+    Відправляє статусне повідомлення про роботу скрипта.
+    """
+    send_telegram_message("✅ Скрипт працює!")
 
-# Надіслати повідомлення при запуску
-print("[DEBUG] Викликаємо `send_telegram_message` з текстом: Скрипт запущено і працює!")
-send_telegram_message(f"✅ Скрипт запущено і працює!")
-# Запустити перевірку
-check_news()
+# === Головний блок ===
 
-# Запуск перевірки новин кожні 10 хвилин
-schedule.every(10).minutes.do(check_news)
+# Надсилання повідомлення при запуску скрипта
+send_status_message()
 
-def check_program():
-    global isCheck  # Вказуємо, що змінюємо глобальну змінну
-    isCheck = True
-    check_news()
-    isCheck = False
+# Розклад завдань:
+# 1. Перевірка новин кожні 30 хвилин
+schedule.every(30).minutes.do(check_news)
 
+# 2. Надсилання статусного повідомлення о 8:00 та 16:00 за Київським часом
+schedule.every().day.at("08:00").do(send_status_message)
+schedule.every().day.at("16:00").do(send_status_message)
 
-# Надсилання повідомлення про статус
-schedule.every().day.at("08:00").do(check_program)
-schedule.every().day.at("16:00").do(check_program)
-
+# Основний цикл для виконання завдань за розкладом
 while True:
     schedule.run_pending()
-    time.sleep(300)
+    time.sleep(1)  # Перевірка розкладу кожну секунду
