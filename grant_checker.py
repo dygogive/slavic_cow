@@ -14,7 +14,6 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # Список ID чатів
 CHAT_ID_1 = "1037025457"
 CHAT_ID_2 = "8171469284"
-CHAT_IDS = [CHAT_ID_1, CHAT_ID_2]  
 
 # URL сайту
 URL = "https://www.dar.gov.ua/news"
@@ -24,12 +23,14 @@ KYIV_TZ = timezone("Europe/Kiev")
 
 def send_telegram_message(text):
     unique_text = f"{text} | ID: {datetime.datetime.now().timestamp()}"
-    for chat_id in CHAT_IDS:
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        params = {"chat_id": chat_id, "text": unique_text}
-        response = requests.get(url, params=params)
-        print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
-        time.sleep(3)
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    params = {"chat_id": CHAT_ID_1, "text": unique_text}
+    response = requests.get(url, params=params)
+    print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
+    params = {"chat_id": CHAT_ID_2, "text": unique_text}
+    response = requests.get(url, params=params)
+    print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
+    
 
 def check_news():
     try:
