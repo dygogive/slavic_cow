@@ -79,8 +79,8 @@ def send_status_message():
 send_status_message()
 
 # Розклад завдань:
-# 1. Перевірка новин кожні 30 хвилин
-schedule.every(30).minutes.do(check_news)
+# 1. Перевірка новин кожні 20 хвилин
+schedule.every(20).minutes.do(check_news)
 
 # 2. Надсилання статусного повідомлення о 8:00 та 16:00 за Київським часом
 schedule.every().day.at("08:00").do(send_status_message)
@@ -89,4 +89,4 @@ schedule.every().day.at("16:00").do(send_status_message)
 # Основний цикл для виконання завдань за розкладом
 while True:
     schedule.run_pending()
-    time.sleep(1)  # Перевірка розкладу кожну секунду
+    time.sleep(600)  # Перевірка розкладу кожну секунду
