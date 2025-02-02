@@ -32,10 +32,10 @@ def send_telegram_message(text):
     print(f"Message sent to {CHAT_ID_1}. Response: {response1.status_code} - {response1.text}")
 
     # Другий чат
-    #unique_text2 = f"{text} | ID: {datetime.datetime.now().timestamp()}"
-    #params2 = {"chat_id": CHAT_ID_2, "text": unique_text2}
-    #response2 = requests.get(url, params=params2)
-    #print(f"Message sent to {CHAT_ID_2}. Response: {response2.status_code} - {response2.text}")
+    unique_text2 = f"{text} | ID: {datetime.datetime.now().timestamp()}"
+    params2 = {"chat_id": CHAT_ID_2, "text": unique_text2}
+    response2 = requests.get(url, params=params2)
+    print(f"Message sent to {CHAT_ID_2}. Response: {response2.status_code} - {response2.text}")
 
 
 
