@@ -6,6 +6,8 @@ import datetime
 import os
 from pytz import timezone
 
+isCheck = false
+
 # Токен і Chat ID для Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
@@ -62,22 +64,30 @@ def check_news():
         # Якщо новина не знайдена
         if not found:
             print(f"Новин з датою {target_date} не знайдено.")
+            if isCheck:
+                send_telegram_message(f"🔴 Новин з датою {target_date} не знайдено.")
     except Exception as e:
         print("Помилка у виконанні запиту або парсингу:", e)
 
 
 # Надіслати повідомлення при запуску
 print("[DEBUG] Викликаємо `send_telegram_message` з текстом: Скрипт запущено і працює!")
-send_telegram_message("✅ Скрипт запущено і працює!")
+send_telegram_message(f"✅ Скрипт запущено і працює!")
 # Запустити перевірку
 check_news()
 
 # Запуск перевірки новин кожні 10 хвилин
 schedule.every(10).minutes.do(check_news)
 
+def check_program():
+    isCheck = true
+    check_news()
+    isCheck = false
+
+
 # Надсилання повідомлення про статус
-schedule.every().day.at("08:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
-schedule.every().day.at("17:00").do(lambda: send_telegram_message("✅ Скрипт працює!"))
+schedule.every().day.at("08:00").do(check_program())
+schedule.every().day.at("17:00").do(check_program())
 
 while True:
     schedule.run_pending()
