@@ -6,7 +6,7 @@ import datetime
 import os
 from pytz import timezone
 
-isCheck = false
+isCheck = False
 
 # Токен і Chat ID для Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -80,9 +80,9 @@ check_news()
 schedule.every(10).minutes.do(check_news)
 
 def check_program():
-    isCheck = true
+    isCheck = True
     check_news()
-    isCheck = false
+    isCheck = False
 
 
 # Надсилання повідомлення про статус
