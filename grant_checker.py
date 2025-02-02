@@ -80,6 +80,7 @@ check_news()
 schedule.every(10).minutes.do(check_news)
 
 def check_program():
+    global isCheck  # Вказуємо, що змінюємо глобальну змінну
     isCheck = True
     check_news()
     isCheck = False
@@ -87,7 +88,7 @@ def check_program():
 
 # Надсилання повідомлення про статус
 schedule.every().day.at("08:00").do(check_program)
-schedule.every().day.at("00:45").do(check_program)
+schedule.every().day.at("00:51").do(check_program)
 
 while True:
     schedule.run_pending()
