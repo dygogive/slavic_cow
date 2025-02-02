@@ -93,8 +93,8 @@ def check_program():
 
 # Надсилання повідомлення про статус
 schedule.every().day.at("08:00").do(check_program)
-schedule.every().day.at("01:04").do(check_program)
+schedule.every().day.at("16:00").do(check_program)
 
 while True:
     schedule.run_pending()
-    time.sleep(1)
+    time.sleep(300)
