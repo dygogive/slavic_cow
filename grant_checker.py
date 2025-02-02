@@ -14,7 +14,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # Список ID чатів
 CHAT_ID_1 = "1037025457"
 CHAT_ID_2 = "8171469284"
-CHAT_IDS = [CHAT_ID_1]  
+CHAT_IDS = [CHAT_ID_1, CHAT_ID_2]  
 
 # URL сайту
 URL = "https://www.dar.gov.ua/news"
@@ -80,6 +80,7 @@ check_news()
 schedule.every(10).minutes.do(check_news)
 
 def check_program():
+    print("test1")
     global isCheck  # Вказуємо, що змінюємо глобальну змінну
     isCheck = True
     check_news()
@@ -88,7 +89,7 @@ def check_program():
 
 # Надсилання повідомлення про статус
 schedule.every().day.at("08:00").do(check_program)
-schedule.every().day.at("00:51").do(check_program)
+schedule.every().day.at("01:04").do(check_program)
 
 while True:
     schedule.run_pending()
