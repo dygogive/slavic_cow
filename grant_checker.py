@@ -26,10 +26,10 @@ def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     params = {"chat_id": CHAT_ID_1, "text": unique_text}
     response = requests.get(url, params=params)
-    print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
+    print(f"Message sent to {CHAT_ID_1}. Response: {response.status_code} - {response.text}")
     params = {"chat_id": CHAT_ID_2, "text": unique_text}
     response = requests.get(url, params=params)
-    print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
+    print(f"Message sent to {CHAT_ID_2}. Response: {response.status_code} - {response.text}")
     
 
 def check_news():
