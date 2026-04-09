@@ -7,86 +7,130 @@ import os
 from pytz import timezone
 
 # === Налаштування ===
-# Telegram Bot Token
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # Токен Telegram-бота (зчитується із середовища)
-
-# Чат ID для надсилання повідомлень
-CHAT_IDS = ["1037025457", "8171469284"]  # Список ID чатів, куди надсилати повідомлення
-
-# URL сайту для перевірки новин
-URL = "https://www.dar.gov.ua/news"
-
-# Часовий пояс Києва
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_IDS = ["8348118669"]
 KYIV_TZ = timezone("Europe/Kiev")
+
+URL = "https://dar.gov.ua/novyny"
+
+# Ключові слова — головне що новина про корів
+KEYWORDS = [
+    "корів",
+    "корови",
+    "корова",
+]
+
+# Ключові слова що означають ЗУПИНКУ — ігноруємо
+STOP_KEYWORDS = [
+    "призупинено",
+    "завершено",
+    "зупинено",
+]
+
+SENT_FILE = "sent_links.txt"
 
 # === Функції ===
 
+def load_sent_links():
+    if not os.path.exists(SENT_FILE):
+        return set()
+    with open(SENT_FILE, "r") as f:
+        return set(line.strip() for line in f.readlines())
+
+def save_sent_link(link):
+    with open(SENT_FILE, "a") as f:
+        f.write(link + "\n")
+
 def send_telegram_message(text):
-    """
-    Надсилання повідомлення у Telegram до всіх чатів із списку CHAT_IDS.
-    """
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     for chat_id in CHAT_IDS:
-        params = {"chat_id": chat_id, "text": text}
-        response = requests.get(url, params=params)
-        print(f"Message sent to {chat_id}. Response: {response.status_code} - {response.text}")
+        params = {"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
+        try:
+            response = requests.get(url, params=params, timeout=10)
+            print(f"Надіслано до {chat_id}: {response.status_code}")
+        except Exception as e:
+            print(f"Помилка надсилання до {chat_id}: {e}")
 
-def check_news():
-    """
-    Перевіряє новини на сайті за цільовою датою (поточний день).
-    Якщо знаходить новину з сьогоднішньою датою, надсилає повідомлення.
-    """
+def parse_date(text):
+    """Парсить дату формату DD.MM.YYYY з тексту"""
+    for word in text.split():
+        try:
+            return datetime.datetime.strptime(word.strip(), "%d.%m.%Y").date()
+        except:
+            continue
+    return None
+
+def check_site():
     try:
-        # Отримання HTML-сторінки
-        response = requests.get(URL)
+        response = requests.get(URL, timeout=15)
         soup = BeautifulSoup(response.text, "html.parser")
+        sent_links = load_sent_links()
 
-        # Пошук усіх дат новин на сторінці
-        dates = soup.find_all("p", class_="paragraph-18 textadata")
-        if not dates:
-            print("Дати не знайдено. Можливо, структура сайту інша.")
-            send_telegram_message("🔴 Дати не знайдено. Можливо, структура сайту інша.")
-            return
+        now = datetime.datetime.now(KYIV_TZ)
+        today = now.date()
 
-        # Отримання поточної дати в Київському часі
-        target_date = datetime.datetime.now(KYIV_TZ).strftime("%Y-%m-%d")
-        print(f"Перевіряємо цільову дату: {target_date}")
+        cards = soup.find_all(["article", "div", "li"])
 
-        # Перевірка кожної знайденої дати
-        for date_element in dates:
-            date = date_element.text.strip()
-            print(f"Перевіряємо дату: {date}")
+        for card in cards:
+            all_text = card.get_text(separator=" ")
 
-            if date == target_date:  # Якщо дата збігається з цільовою
-                send_telegram_message(f"🟢 Знайдено новину з датою {target_date}! Перевірте сайт: {URL}")
-                print("Повідомлення надіслано.")
-                return  # Зупиняємо перевірку після першого збігу
+            # Шукаємо дату в картці
+            news_date = parse_date(all_text)
 
-        # Якщо новини з сьогоднішньою датою не знайдено
-        print(f"Новин з датою {target_date} не знайдено.")
+            # Якщо дата не знайдена або новина стара — пропускаємо
+            if news_date is None or news_date < today:
+                continue
+
+            # Шукаємо посилання в картці
+            link = card.find("a", href=True)
+            if not link:
+                continue
+
+            title = link.get_text(strip=True).lower()
+            href = link["href"]
+
+            if not title or len(title) < 10:
+                continue
+
+            # Пропускаємо новини про зупинку
+            if any(kw in title for kw in STOP_KEYWORDS):
+                print(f"Пропускаємо (зупинка): {title}")
+                continue
+
+            # Головна умова — є слово про корів
+            if any(kw in title for kw in KEYWORDS):
+                full_url = href if href.startswith("http") else "https://dar.gov.ua" + href
+
+                if full_url not in sent_links:
+                    msg = (
+                        f"🐄 <b>УВАГА! Нова новина про корів!</b>\n\n"
+                        f"📅 Дата: {news_date.strftime('%d.%m.%Y')}\n"
+                        f"📌 {link.get_text(strip=True)}\n\n"
+                        f"🔗 {full_url}\n\n"
+                        f"⏰ {now.strftime('%d.%m.%Y %H:%M')}\n\n"
+                        f"👉 Перевір та подавай заявку!"
+                    )
+                    send_telegram_message(msg)
+                    save_sent_link(full_url)
+                    print(f"✅ Знайдено: {full_url} (дата: {news_date})")
+
+        print(f"[{now.strftime('%H:%M')}] Перевірено. Сьогодні: {today.strftime('%d.%m.%Y')}")
+
     except Exception as e:
-        print("Помилка у виконанні запиту або парсингу:", e)
+        print(f"Помилка: {e}")
 
 def send_status_message():
-    """
-    Відправляє статусне повідомлення про роботу скрипта.
-    """
-    send_telegram_message("✅ Скрипт працює!")
+    now = datetime.datetime.now(KYIV_TZ).strftime("%d.%m.%Y %H:%M")
+    send_telegram_message(f"✅ Бот активний. Моніторинг dar.gov.ua/novyny\n⏰ {now}")
 
-# === Головний блок ===
-
-# Надсилання повідомлення при запуску скрипта
+# === Запуск ===
 send_status_message()
+check_site()
 
-# Розклад завдань:
-# 1. Перевірка новин кожні 20 хвилин
-schedule.every(20).minutes.do(check_news)
-
-# 2. Надсилання статусного повідомлення о 8:00 та 16:00 за Київським часом
+schedule.every(20).minutes.do(check_site)      # кожні 20 хвилин
 schedule.every().day.at("08:00").do(send_status_message)
-schedule.every().day.at("16:00").do(send_status_message)
+schedule.every().day.at("20:00").do(send_status_message)
 
-# Основний цикл для виконання завдань за розкладом
 while True:
     schedule.run_pending()
-    time.sleep(600)  # Перевірка розкладу кожну секунду
+    time.sleep(60)
