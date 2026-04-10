@@ -67,8 +67,8 @@ def check_site():
         sent_links = load_sent_links()
 
         now = datetime.datetime.now(KYIV_TZ)
-        today = now.date()
-today = datetime.date(2026, 4, 5)
+        # today = now.date()  # робоча версія
+        today = datetime.date(2026, 4, 5)  # ТЕСТ
 
         cards = soup.find_all(["article", "div", "li"])
 
