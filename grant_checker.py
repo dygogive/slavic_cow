@@ -68,6 +68,7 @@ def check_site():
 
         now = datetime.datetime.now(KYIV_TZ)
         today = now.date()
+today = datetime.date(2026, 4, 5)
 
         cards = soup.find_all(["article", "div", "li"])
 
